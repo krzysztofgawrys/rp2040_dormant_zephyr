@@ -1,0 +1,128 @@
+/ {
+        chosen {
+                zephyr,console = &uart0;
+                // uart,passthrough = &uart0;
+        };
+
+        leds {
+                compatible = "gpio-leds";
+                led0: led_0 {
+                        gpios = <&gpio0 29 GPIO_ACTIVE_HIGH>;
+                        label = "LED";
+                };
+                led1: led_1 {
+                        gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
+                        label = "LED";
+                };
+                led2: led_2 {
+                        gpios = <&gpio0 15 GPIO_ACTIVE_HIGH>;
+                        label = "LED";
+                };
+                ledold: ledold {
+                        gpios = <&gpio0 18 GPIO_ACTIVE_HIGH>;
+                        label = "LED";
+                };
+        };
+
+        pwr_control {
+                compatible = "gpio-leds";
+                gsm: gsm {
+                        gpios = <&gpio0 11 GPIO_ACTIVE_HIGH>;
+                        label = "GSM";
+                };
+                sd: sd {
+                        gpios = <&gpio0 18 GPIO_ACTIVE_HIGH>;
+                        label = "SDCARD";
+                };
+                ina: ina {
+                        gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+                        label = "INA219";
+                };
+        };
+
+        // wakeup {
+                //         rtc_irq: rtc_irq {
+                        //                 compatible = "wakeup";
+                        //                 gpios = <&gpio0 25 GPIO_ACTIVE_LOW>;
+                        //                 label = "RTCIRQ";
+                //         };
+        // };
+
+        zephyr,user {
+                io-channels = <&adc 2>;
+                pwr-gpios = <&gpio0 6 GPIO_ACTIVE_HIGH>,
+                            <&gpio0 8 GPIO_ACTIVE_HIGH>,
+                            <&gpio0 9 GPIO_ACTIVE_HIGH>,
+                            <&gpio0 10 GPIO_ACTIVE_HIGH>,
+                            <&gpio0 4 GPIO_ACTIVE_HIGH>;
+        };
+
+        aliases {
+                led0 = &led0;
+                led1 = &led1;
+                gsm = &gsm;
+                ina = &ina;
+                sd = &sd;
+                clocks = &clocks;
+                ledold = &ledold;
+        };
+
+};
+
+// &rtc_irq {
+        //         status = "okay";
+        //         wakeup-source;
+// };
+
+&uart0 {
+        current-speed = <115200>;
+        status = "okay";
+        pinctrl-0 = <&uart_log>;
+        pinctrl-names = "default";
+};
+
+&pinctrl {
+        uart_gsm: uart_gsm {
+                group1 {
+                        pinmux = <UART0_TX_P16>;
+                };
+                group2 {
+                        pinmux = <UART0_RX_P17>;
+                        input-enable;
+                };
+        };
+
+        uart_log: uart_log {
+                group1 {
+                        pinmux = <UART0_TX_P0>;
+                };
+                group2 {
+                        pinmux = <UART1_RX_P21>;
+                        input-enable;
+                };
+        };
+};
+
+&zephyr_udc0 {
+        usb: usb {
+                compatible = "zephyr,cdc-acm-uart";
+                label = "CDC_ACM_0";
+        };
+};
+
+// &pico_header {
+        //         status = "okay";
+// };
+
+&adc {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@2 {
+                reg = <2>;
+                zephyr,gain = "ADC_GAIN_1";
+                zephyr,reference = "ADC_REF_INTERNAL";
+                zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+                zephyr,resolution = <12>;
+        };
+};
